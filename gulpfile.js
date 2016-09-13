@@ -1,43 +1,72 @@
-// Requis
+// Load Gulp and plugins
 var gulp = require('gulp');
+var less = require('gulp-less');
+var cssComb = require('gulp-csscomb');
+var cssBeautify = require('gulp-cssbeautify');
+var autoPrefixer = require('gulp-autoprefixer');
+var ccsO = require('gulp-csso');
+var rename = require('gulp-rename');
+var ts = require('gulp-typescript');
+var merge = require('merge2');
+var del = require('del');
+var flatten = require('gulp-flatten');
 
-// Include plugins
-var plugins = require('gulp-load-plugins')(); // tous les plugins de package.json
+// Path variables
+var SOURCE = './src';
+var DESTINATION = './dist';
 
-// Variables de chemins
-var source = './src'; // dossier de travail
-var destination = './dist'; // dossier à livrer
-
-// Tâche "build" = LESS + autoprefixer + CSScomb + beautify (source -> destination)
-gulp.task('css', function () {
-  return gulp.src(source + '/assets/css/styles.less')
-    .pipe(plugins.less())
-    .pipe(plugins.csscomb())
-    .pipe(plugins.cssbeautify({indent: '  '}))
-    .pipe(plugins.autoprefixer())
-    .pipe(gulp.dest(destination + '/assets/css/'));
+//  Styles task : LESS + autoprefixer + CSScomb + beautify (source -> destination)
+gulp.task('styles', function () {
+  return gulp.src(SOURCE + '/assets/styles/styles.less')
+    .pipe(less())
+    .pipe(cssComb())
+    .pipe(cssBeautify({indent: '  '}))
+    .pipe(autoPrefixer())
+    .pipe(gulp.dest(DESTINATION + '/assets/css/'));
 });
 
-// Tâche "minify" = minification CSS (destination -> destination)
+// Minify task : CSS minification (destination -> destination)
 gulp.task('minify', function () {
-  return gulp.src(destination + '/assets/css/*.css')
-    .pipe(plugins.csso())
-    .pipe(plugins.rename({
+  return gulp.src(DESTINATION + '/assets/css/*.css')
+    .pipe(cssO())
+    .pipe(rename({
       suffix: '.min'
     }))
-    .pipe(gulp.dest(destination + '/assets/css/'));
+    .pipe(gulp.dest(DESTINATION + '/assets/css/'));
+});
+// Scripts task : Generate both JavaScript and TypeScript definition files
+gulp.task('scripts', function() {
+    var tsResult = gulp.src(SOURCE  + '/**/*.ts')
+        .pipe(ts({
+            declaration: true,
+            noExternalResolve: true
+        }));
+
+    return merge([
+        tsResult.dts.pipe(flatten())
+        .pipe(gulp.dest(DESTINATION + '/assets/definitions')),
+        tsResult.js.pipe(flatten())
+        .pipe(gulp.dest(DESTINATION + '/assets/js'))
+    ]);
 });
 
-// Tâche "build"
-gulp.task('build', ['css']);
+gulp.task('clean', function () {
+  return del([
+    DESTINATION
+  ]);
+});
 
-// Tâche "prod" = Build + minify
+// Build task
+gulp.task('build', ['clean', 'styles', 'scripts']);
+
+// Prod task : Build + Minify
 gulp.task('prod', ['build',  'minify']);
 
-// Tâche "watch" = je surveille *less
+// Watch task : watch *less ans *ts
 gulp.task('watch', function () {
-  gulp.watch(source + '/assets/css/*.less', ['build']);
+  gulp.watch(SOURCE + '/assets/styles/*.less', ['styles']);
+  gulp.watch(SOURCE + '/assets/scripts/*.ts', ['scripts']);
 });
 
-// Tâche par défaut
+// Default task
 gulp.task('default', ['build']);
