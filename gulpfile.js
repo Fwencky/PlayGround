@@ -36,7 +36,7 @@ gulp.task('minify', function () {
 });
 // Scripts task : Generate both JavaScript and TypeScript definition files
 gulp.task('scripts', function() {
-    let tsResult = gulp.src(SOURCE  + '/**/*.ts')
+    var tsResult = gulp.src(SOURCE  + '/**/*.ts')
         .pipe(ts({
             declaration: true,
             noExternalResolve: true
