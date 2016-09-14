@@ -17,18 +17,15 @@
   },
   "homepage": "https://github.com/Fwencky/PlayGround",
   "devDependencies": {
-    "gulp": "~3.9.1",
-    "gulp-load-plugins": "latest",
-    "gulp-rename": "latest",
-    "gulp-csso": "latest",
-    "gulp-less": "latest",
-    "gulp-csscomb": "latest",
-    "gulp-cssbeautify": "latest",
+    "gulp": "latest",
     "gulp-autoprefixer": "latest",
-    "gulp-install": "~0.6.0",
-    "del": "~2.2.2"
+    "gulp-install": "latest",
+    "del": "latest",
+    "gulp-typescript": "latest",
+    "merge2": "latest",
+    "gulp-flatten": "latest"
   },
   "dependencies": {
-    "gulp-install": "~0.6.0"
+    "gulp-install": "latest"
   }
 }
